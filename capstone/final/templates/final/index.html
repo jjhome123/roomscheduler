@@ -1,0 +1,89 @@
+{% extends "final/layout.html" %}
+
+{% block body %}
+<div class="m-3">
+    <h1>Kokusai Room Scheduler</h1>
+    <h4>Timetable for:</h4>
+    <form method="POST" action="{% url 'index' %}" class="form-inline">
+        {% csrf_token %}
+        <input name="form_date" class="my-1" required type="date" id="date">
+        <button class="btn btn-primary my-1" type="submit">Navigate</button>
+    </form>
+    <div class="py-2 my-2 form-check">
+        <label for="#past_times">Show Previous Times</label>
+        <input type="checkbox" id="past_times">
+    </div>
+    <input type="hidden" id="date_hidden" value="{{datetime|date:'Y-m-d'}}">
+    {% if user.is_authenticated %}
+    <div>
+        <form class="form-inline" action="{% url 'reserve' %}" method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="date" value="{{datetime|date:'Y-m-d'}}">
+            <select id="room_option" name="room">
+                {% for room in rooms %}
+                    <option class="room{{forloop.counter}}" value="{{ room.name }}">{{ room.name }}</option>
+                {% endfor %}
+            </select>
+            <input readonly class="mt-1 form-control" id="start" name="start" placeholder="Click on a start time in the table">
+            <input readonly class="mt-1 form-control" id="end" name="end" placeholder="Click on an end time in the table">
+            <button class="mt-1 btn btn-primary" disabled id="submit_rv" type="submit">Reserve</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+
+<div class="mx-4 table-responsive">
+    <table class="table table-bordered table-hover table-sm">
+        <!--Calendar View-->
+        <thead>
+            <tr>
+                <th scope="col" class="text-center time">Time</th>
+                {% for room in rooms %}
+                    <th scope="col" class="text-center room{{forloop.counter}} header">{{ room.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in reservations %}
+                <tr>
+                    {% for key, value in row.items %}
+                        {% if forloop.first %}
+                            {% if datetime_dayview %}
+                                {% if value < datetime_dayview %}
+                                    <th scope="row" class="text-center passed time" id="{{value|time:'G:i'}}" data-time="{{value|time:'G:i'}}">{{ value|time:"G:i" }}</th>
+                                {% else %}
+                                    <th scope="row" class="text-center time" id="{{value|time:'G:i'}}" data-time="{{value|time:'G:i'}}">{{ value|time:"G:i" }}</th>
+                                {% endif %}
+                            {% else %}
+                                {% if value < datetime %}
+                                    <th scope="row" class="text-center passed time" id="{{value|time:'G:i'}}" data-time="{{value|time:'G:i'}}">{{ value|time:"G:i" }}</th>
+                                {% else %}
+                                    <th scope="row" class="text-center time" id="{{value|time:'G:i'}}" data-time="{{value|time:'G:i'}}">{{ value|time:"G:i" }}</th>
+                                {% endif %}
+                            {% endif %}
+                        {% else %}
+                            {% if value == "O" %}
+                                <td class="text-center room{{forloop.counter0}} open" data-room="room{{forloop.counter0}}">{{ value }}</td>
+                            {% elif value == "-" %}
+                                <td class="text-center passed room{{forloop.counter0}}" data-room="room{{forloop.counter0}}">{{ value }}</td>
+                            {% elif value.0 == "(" %}
+                                <td class="text-center passed room{{forloop.counter0}}" data-room="room{{forloop.counter0}}"><a href="{% url 'user_rvs' value|slice:'1:-1' %}">{{ value|slice:"1:-1" }}</a></td>
+                            {% else %}
+                                <td class="text-center booked room{{forloop.counter0}}" data-room="room{{forloop.counter0}}"><a href="{% url 'user_rvs' value %}">{{ value }}</a></td>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th scope="col" class="text-center time">Time</th>
+                {% for room in rooms %}
+                    <th scope="col" class="text-center">{{ room.name }}</th>
+                {% endfor %}
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}

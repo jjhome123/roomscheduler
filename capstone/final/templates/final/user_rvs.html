@@ -1,0 +1,68 @@
+{% extends 'final/layout.html' %}
+
+{% block body %}
+
+<div class="mx-2">
+    <h1>Upcoming Reservations for <span id="user">{{ reserver }}</span></h1>
+    <table class="table table-bordered table-hover mx-2">
+        {% if reservations_u %}
+        <thead>
+            <th>Room</th>
+            <th>Day</th>
+            <th>Start</th>
+            <th>End</th>
+            {% if user.is_authenticated and reserver == request.user.username %}
+            <th>Action</th>
+            {% endif %}
+        </thead>
+        {% endif %}
+        <tbody>
+            {% for reservation in reservations_u reversed %}
+                <tr>
+                    {% csrf_token %}
+                    <td class="rv{{forloop.counter}}" data-room="{{reservation.room.name}}">{{ reservation.room.name }}</td>
+                    <td class="rv{{forloop.counter}}" data-date="{{reservation.date|date:'Y-m-d'}}">{{ reservation.date }}</td>
+                    <td class="rv{{forloop.counter}}" data-start="{{ reservation.start|time:'G:i' }}">{{ reservation.start|time:"G:i" }}</td>
+                    <td class="rv{{forloop.counter}}" data-end="{{ reservation.end|time:'G:i' }}">{{ reservation.end|time:"G:i" }}</td>
+                    {% if user.is_authenticated and reserver == request.user.username %}
+                        <td><a class="delete_rv" data-rv="{{forloop.counter}}">Delete</a></td>
+                    {% endif %}
+                </tr>
+            {% empty %}
+        </tbody>
+    </table>
+    <h2>No upcoming reservations.</h2>
+    <br>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <h1>Past Reservations for {{ reserver }}</h1>
+    <table class="table table-bordered table-hover mx-2">
+        {% if reservations_p %}
+        <thead>
+            <th>Room</th>
+            <th>Day</th>
+            <th>Start</th>
+            <th>End</th>
+        </thead>
+        {% endif %}
+        <tbody>
+            {% for reservation in reservations_p reversed %}
+                <tr>
+                    <td>{{ reservation.room.name }}</td>
+                    <td>{{ reservation.date }}</td>
+                    <td>{{ reservation.start|time:"G:i" }}</td>
+                    <td>{{ reservation.end|time:"G:i" }}</td>
+                </tr>
+            {% empty %}
+        </tbody>
+    </table>
+    <h2>No past reservations.</h2>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+
+{% endblock %}

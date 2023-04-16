@@ -1,0 +1,31 @@
+th {
+    min-width: 50px;
+}
+
+table {
+    max-width: 75vw;
+}
+
+td.booked {
+    background-color: lightcoral;
+}
+
+td.booked a {
+    color: white;
+}
+
+th.passed {
+    background-color: lightgray;
+}
+
+td.passed {
+    background-color: lightgray;
+}
+
+button.right {
+    align-content: end;
+}
+
+#date {
+    font-size: 18px;
+}
