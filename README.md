@@ -117,4 +117,4 @@ Contains minor style adjustments outside of Bootstrap styling.
 ***
 ## How to Run this Application
 
-Running the command `python manage.py runserver` will allow you to run the application on a development server.
+After installing Django with `pip install django`, running `python manage.py runserver` in the directory with the `manage.py` file will allow you to run the application on a development server.
